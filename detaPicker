@@ -1,0 +1,73 @@
+class DatePicker {
+  constructor(el) {
+    if (typeof el === 'string') el = document.querySelector(el)
+    // 浮层容器
+    const ul = document.createElement('ul')
+    const style = ul.style
+    const position = el.getBoundingClientRect()
+    style.left = `${position.left}px`
+    // style.top = `${position.top + el.offsetHeight}px`
+
+    // 有些页面DOM需要等Vue实例化后才加载出来，影响高度计算
+    setTimeout(function() {
+      style.top = `${el.offsetTop + el.offsetHeight}px`
+    }, 2000)
+
+    style.position = 'absolute'
+    style.display = 'none'
+    style.margin = 0
+    style.padding = 0
+    style.width = '200px'
+    style.height = '300px'
+    style.border = 'solid 1px #ccc'
+    style.backgroundColor = '#fff'
+    style.overflowY = 'scroll'
+    style.cursor = 'default'
+    style.fontSize = '14px'
+
+    const tg = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸']
+    const dz = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
+
+    // 年份列表
+    const year = new Date().getFullYear()
+    const min = 1753
+    const count = year - min + 1
+
+    // 1753年的干支
+    let t = 9
+    let d = 9
+
+    // 插入li
+    for (let i = 0; i < count; i++) {
+      const li = document.createElement('li')
+      const gz = `${tg[t++]}${dz[d++]}`
+      li.dataset.value = `${min + i}`
+      li.innerHTML = `${min + i}&emsp;&emsp;${gz}年`
+      t > 9 && (t = 0)
+      d > 11 && (d = 0)
+
+      li.style.listStyle = 'none'
+      li.style.padding = '5px'
+      ul.appendChild(li)
+    }
+    document.body.appendChild(ul)
+
+    // 显示picker
+    el.addEventListener('click', e => {
+      e.stopPropagation()
+      style.display = 'block'
+    })
+    // 隐藏picker
+    document.addEventListener('click', () => {
+      style.display = 'none'
+    })
+    // 选择一个年份
+    ul.addEventListener('click', e => {
+      e.stopPropagation()
+      const tar = e.target
+      el.value = tar.dataset.value
+      style.display = 'none'
+    })
+  }
+}
+if (document.querySelector('[type=year]')) new DatePicker('[type=year]')
